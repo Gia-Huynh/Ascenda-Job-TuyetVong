@@ -1,16 +1,14 @@
 import json
 import utils
-userInput = "2020-04-24"
+userInput = "2019-12-25"
 filePath = 'input.json'
 dateRange = 5
 userInput = utils.addDate (userInput, dateRange)
-categorySkipList = ['Hotel']
-categoryIdSkipList = ['3']
+categorySkipList = ['3']
 class jsonObject ():
-    def __init__ (self, userInput = None, categorySkipList = None, categoryIdSkipList = None):
+    def __init__ (self, userInput = None, categorySkipList = None):
         self.data = None
         self.categorySkipList = categorySkipList
-        self.categoryIdSkipList = categoryIdSkipList
         self.userInput = userInput
     def getData (self):
         return self.data
@@ -19,7 +17,7 @@ class jsonObject ():
             self.data = json.load(f)
     def getCleanedData (self):
         #Optional steps, to remove data clutter by removing
-        #unused class.
+        #unused class. Used while debugging to store only important information.
         category_Keep_list = ["id", "category", "merchants", "valid_to"]
         bak_data = self.data
         for a in bak_data['offers']:
@@ -33,26 +31,24 @@ class jsonObject ():
         #Step 2 Actual: Convert checkin date to "YYYY-MM-DD" format and just simply
         # do string comparison with offer date
         if (self.categorySkipList != None):
-            if (offer["category"] in self.categorySkipList):
+            if (str(offer["category"]) in self.categorySkipList):
                 print ("Rejected, category: ", offer)
-                return 0
-        if (self.categoryIdSkipList != None):
-            if (str(offer["id"]) in self.categoryIdSkipList):
-                print ("Rejected, categoryID: ", offer)
-                return 0
+                return False
         if (self.userInput != None):
             if (offer["valid_to"] >= self.userInput) == False:
                 print ("Rejected, valid date: ",offer)
-                return 0
+                return False
         print ("Accpeted: ",offer)
-        return 1
+        return True
     def getBestOffers(self):
-        CleanedData = self.getCleanedData()
-        for a in CleanedData['offers']:
-            self.filterOffer (a)
-        return 0
+        Data = self.getCleanedData()
+        #for a in Data['offers']:
+        #    if (self.filterOffer (a) == False):
+        #        Data['offers'].remove (a)
+        nigger = [a for a in Data['offers'] if self.filterOffer (a)]
+        return nigger
 
     
-test = jsonObject (userInput, categorySkipList, categoryIdSkipList)
+test = jsonObject (userInput, categorySkipList)
 test.readFile (filePath)
 test.getBestOffers()
