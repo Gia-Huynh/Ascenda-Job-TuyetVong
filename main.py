@@ -1,11 +1,31 @@
 import json
+from argparse import ArgumentParser
+
+#Date time addition, ultility function
 import utils
-userInput = "2019-12-25"
-filePath = 'input.json'
-dateRange = 5
+
+parser = ArgumentParser()
+parser.add_argument("-dateInput", "--dateInput", dest="userInput",
+                    help="User inputted date", default="2019-12-25")
+parser.add_argument("-filename", "--fileName", dest="filePath",
+                    help="User inputted Path to file", default='input.json')
+parser.add_argument("-dateRange", "--dateRange", dest="dateRange",
+                    help="User inputted Path to file", default=5)
+
+args = parser.parse_args()
+userInput = args.userInput
+dateRange = int(args.dateRange)
+filePath = args.filePath
+
+#Add N days to the input of the user
+#Result still has the same format of yyyy-mm-dd
 userInput = utils.addDate (userInput, dateRange)
+
+#Skipping categor 3, can add more category if needed
 categorySkipList = ['3']
+
 class jsonObject ():
+    
     def __init__ (self, userInput = None, categorySkipList = None, numOfferNeeded = 2):
         self.data = None
         self.categorySkipList = categorySkipList
@@ -13,16 +33,20 @@ class jsonObject ():
         #This class should only return 2 offers even though there are several eligible offers
         #Make it N possible offers
         self.numOfferNeeded = numOfferNeeded
+        
     def getData (self):
         return self.data
+    
     def readFile (self, filePath):
         with open(filePath) as f:
             self.data = json.load(f)
+            
     def getCleanedData (self, debugMode = 0):
         data = self.data
         #"If an offer is available in multiple merchants, only select the closest merchant"
         for offer in data ['offers']:
-            if len (offer['merchants'])>1:
+            if len (offer['merchants'])>0:
+                #Only the top one best merchant needed to be stored so we do one iteration.
                 bestMerchant = offer['merchants'][0]
                 for merchant in offer['merchants']:
                     if (merchant['distance'] < bestMerchant['distance']):
@@ -31,8 +55,9 @@ class jsonObject ():
                 offer['merchants'].append (bestMerchant)
         if (debugMode == 0):
             return data
-        #Optional steps, to remove data clutter by removing
-        #unused class. Used while debugging to return only important information.
+        
+        #Optional steps, to remove data clutter by removing unused class.
+        #Used only while debugging to retain only important information.
         category_Keep_list = ["id", "category", "merchants", "valid_to"]
         for offer in data['offers']:
             for key in offer.copy():
@@ -59,15 +84,18 @@ class jsonObject ():
 
         #One liner: sorted([offer for offer in Data['offers'] if self.ValiDate (offer)], key=lambda d: d['merchants'][0]['distance'])
         #Nhung chac chan khong doc duoc roi
-
         #chua duoc sort, se sort o duoi
         sortedOffer = [offer for offer in Data['offers'] if self.ValiDate (offer)]
-        idx = [i for i in range (0, len(sortedOffer))]
+
         #If there are multiple offers in the same category *give priority to the closest merchant offer*.
         #If there are multiple offers with different categories, *select the closest merchant offers when selecting 2 offers*.
-        pos = 0
+        #Sort dai theo distance gan nhat la duoc.
         sortedOffer = sorted(sortedOffer, key=lambda d: d['merchants'][0]['distance'])
+
+        #Legacy code, should be deleted
         #Gnomesort, cuz I'm lazy coding this
+        #idx = [i for i in range (0, len(sortedOffer))]
+        #pos = 0
         #while (pos + 1 < len(idx)):
         #    if (pos == 0) or (sortedOffer[idx[pos]]['merchants'][0]['distance'] > sortedOffer[idx[pos-1]]['merchants'][0]['distance']):
         #        pos = pos+1
@@ -79,19 +107,26 @@ class jsonObject ():
         #        pos = pos-1
         #sortedOffer = [sortedOffer[i] for i in range (0, len(idx))]
         #print (sortedOffer)
+        
         count = 0
         selectedOffers = []
-        for i in range (0, len(idx)):
+        for i in sortedOffer:
+            #Break if we have found enough offer to satisfy
+            #Or stop when i has gon thru the list fully.
             if (count == self.numOfferNeeded):
                 break
             #"selected offers should be in different categories"
+            #So just check if the current best offer has clashing categories with
+            #  the one we have already selected.
             categoryExistCheck = 0
             for a in selectedOffers:
-                if (a['category'] == sortedOffer[idx[i]]['category']):
+                if (a['category'] == i['category']):
                     categoryExistCheck = 1
                     break
+            #Current best offer is not clashing category with selected offer.
+            #Add it to the selected list
             if (categoryExistCheck == 0):
-                selectedOffers.append (sortedOffer[idx[i]])
+                selectedOffers.append (i)
             count = count + 1
         result = {'offers':selectedOffers}
         return result

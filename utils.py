@@ -18,6 +18,14 @@ def addDate (stringInput, addNum):
             #Some optimization can be done here, instead of
             # adding 1 by 1 to D,
             # we can add the Day in Month minus 1 straight into D
+            # Done, the above sentence is incorrect, but hey
+            # Tested and made sure that it's working
+            #print (addNum, ' ', D,' ',getDayInMonth ())
+
+            if (getDayInMonth() - D < addNum):
+                addNum = addNum - (getDayInMonth() - D)
+                D = getDayInMonth()
+                
             D = D + 1
             if (D - 1 == getDayInMonth ()):
                 D = 1
@@ -27,9 +35,10 @@ def addDate (stringInput, addNum):
                     M = 1
             addNum = addNum - 1
         return Y, M ,D
-    Y = int(stringInput.split('-')[0])
-    M = int(stringInput.split('-')[1])
-    D = int(stringInput.split('-')[2])
-    Y, M, D = addDate (Y,M,D,addNum)
+    #Y = int(stringInput.split('-')[0])
+    #M = int(stringInput.split('-')[1])
+    #D = int(stringInput.split('-')[2])
+    T = stringInput.split('-')
+    Y, M, D = addDate (int (T[0]),int (T[1]),int (T[2]),addNum)
     result = f'{Y:04d}-{M:02d}-{D:02d}'
     return result
