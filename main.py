@@ -46,7 +46,7 @@ class jsonObject ():
         #"If an offer is available in multiple merchants, only select the closest merchant"
         for offer in data ['offers']:
             if len (offer['merchants'])>0:
-                #Only the top one best merchant needed to be stored so we do one iteration.
+                #Only the top one best merchant needed to be stored so we do one iteration and save the best.
                 bestMerchant = offer['merchants'][0]
                 for merchant in offer['merchants']:
                     if (merchant['distance'] < bestMerchant['distance']):
@@ -66,7 +66,7 @@ class jsonObject ():
         return data
     
     def ValiDate (self, offer):
-        #Heh, Validate date
+        #Validate date
         #Validate if offer is valid up to the day that the user inputs + 5 days.
         #Also return false if category is in the banned category list.
 
@@ -83,8 +83,8 @@ class jsonObject ():
         Data = self.getCleanedData(0)
 
         #One liner: sorted([offer for offer in Data['offers'] if self.ValiDate (offer)], key=lambda d: d['merchants'][0]['distance'])
-        #Nhung chac chan khong doc duoc roi
-        #chua duoc sort, se sort o duoi
+        #Nhung code tren chac chan khong doc duoc roi
+        #"Sorted offer" chua duoc sort, se sort o duoi
         sortedOffer = [offer for offer in Data['offers'] if self.ValiDate (offer)]
 
         #If there are multiple offers in the same category *give priority to the closest merchant offer*.
@@ -112,7 +112,7 @@ class jsonObject ():
         selectedOffers = []
         for i in sortedOffer:
             #Break if we have found enough offer to satisfy
-            #Or stop when i has gon thru the list fully.
+            #Or automatically stop when i has gon thru the end of list.
             if (count == self.numOfferNeeded):
                 break
             #"selected offers should be in different categories"
@@ -123,18 +123,19 @@ class jsonObject ():
                 if (a['category'] == i['category']):
                     categoryExistCheck = 1
                     break
-            #Current best offer is not clashing category with selected offer.
-            #Add it to the selected list
+            #If current best offer is not clashing category with selected offer.
             if (categoryExistCheck == 0):
+                #Add it to the selected list
                 selectedOffers.append (i)
             count = count + 1
         result = {'offers':selectedOffers}
         return result
 
     
-test = jsonObject (userInput, categorySkipList)
 #test = jsonObject ()
-test.readFile (filePath)
-result = test.getBestOffers()
-with open('output.json', 'w') as f:
-  json.dump(result, f, ensure_ascii=False, indent=2)
+if __name__ == "__main__":
+    test = jsonObject (userInput, categorySkipList)
+    test.readFile (filePath)
+    result = test.getBestOffers()
+    with open('output.json', 'w') as f:
+      json.dump(result, f, ensure_ascii=False, indent=2)
