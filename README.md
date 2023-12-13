@@ -3,7 +3,8 @@
 
  **1. Overview**  
 	Submission from applicant Huỳnh Thiết Gia to solve Ascenda homework, written in Python, comes bundled with a precompiled exe file for your convenience.
- **2. Installation & Usage**
+ 
+ **2. Installation & Usage**  
  Using any of the options below will run the program which output an `"output.json"` file containing your requested filtered data:  
  - **Using precompiled binary exe file:** Located in the "Binary" folder, you can try running the `"RunExeTest.bat"` file to invoke the program without needing to open your command line app.  
  -  **Run from the source code:** 
@@ -12,11 +13,11 @@
 	3) Run `python main.py --dateInput="2019-12-27"`or run the file `"Run.bat"`.
 	4) The program will create the file `output.json`.
 
- **3. To-do list**
- Unit testing needs to be done to further verify the program's edge case coverage.
+ **3. To-do list**  
+ 	Unit testing needs to be done to further verify the program's edge case coverage.
  
- **4. The excerise**
-Given that the JSON response mentioned above is already loaded inside a file `input.json`, implement a command line application that:
+ **4. The excerise**  
+ Given that the JSON response mentioned above is already loaded inside a file `input.json`, implement a command line application that:
 
 - Accept an argument which is the customer check-in date with the format: `YYYY-MM-DD`
 - Load the `input.json` file
